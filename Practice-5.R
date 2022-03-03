@@ -1,6 +1,7 @@
-# Locating a directory where data and code files are stored
+# Locating a directory where data and code files are stored 
+#(comment the following line and put your computer's location)
 
-setwd("C:/Users/jayna/Documents/GitHub/Materials")
+#setwd("C:/Users/jayna/Documents/GitHub/Materials")
 
 # Loading necessary libraries for data processing and analysis
 library(readr)
@@ -8,7 +9,7 @@ library(dplyr)
 
 # Importing a csv file into R working environment
 dfSession4a <- read_csv(
-  file = "Example_data_session_4.csv"
+  file = "Data-1.csv"
 )
 
 # Checking variable properties and first few data points
@@ -92,3 +93,91 @@ table1(~sex+sexNominal+age+pain+painOrdinal+painYn+maritalNominal
        | clusterID * sexNominal, 
        data = dfSession4a,
        overall = FALSE)
+
+# We want to report Mean and SD as Mean (SD) for ratio scale variables
+table1(~sexNominal+age+painOrdinal+painYn+maritalNominal
+       | clusterID, 
+       render.continuous = c(.="Mean (SD)"),
+       data = dfSession4a,
+       overall = FALSE)
+
+# We want to report Mean and SD as Median for ratio scale variables
+table1(~sexNominal+age+painOrdinal+painYn+maritalNominal
+       | clusterID, 
+       render.continuous = c(.="Median"),
+       data = dfSession4a,
+       overall = FALSE)
+
+
+# Instead of Mean (SD), we want to display Median and IQR 
+table1(~sexNominal+age+painOrdinal+painYn+maritalNominal
+       | clusterID, 
+       render.continuous = c(.="Median (Q1-Q3)"),
+       data = dfSession4a,
+       overall = FALSE)
+
+table1(~sexNominal+age+painOrdinal+painYn+maritalNominal
+       | clusterID, 
+       render.continuous = c(.="Median (IQR)"),
+       data = dfSession4a,
+       overall = FALSE)
+
+
+# We want to calculate proportion of person who has pain 
+
+dfProp <- dfSession4a %>%
+  summarise(
+    propPain = mean(painYn)
+  )
+
+# We want to calculate proportion of male who has pain 
+
+dfProp <- dfSession4a %>%
+  filter(
+    sexNominal=="Male"
+  ) %>%
+  summarise(
+    propPain = mean(painYn)
+  )
+
+# We want to calculate proportion of Female who has pain 
+# Write down the code in line 133
+
+dfProp <- dfSession4a %>%
+  filter(
+    sexNominal=="Female"
+  ) %>%
+  summarise(
+    propPain = mean(painYn)
+  )
+
+# We want to calculate proportion for male and female 
+# both at the same time
+
+dfProp <- dfSession4a %>%
+  group_by(
+    sexNominal
+  ) %>%
+  summarise(
+    propPain = mean(painYn)
+  )
+
+# We want to know whether the proportion of male or female
+# are similar across clusters
+
+dfProp <- dfSession4a %>%
+  group_by(
+    clusterID, sexNominal
+  ) %>%
+  summarise(
+    propPain = mean(painYn)
+  )
+# What is the best way to present this findings?
+
+# Now we want to compute confidence interval of the proportion 
+# for both male and female 
+
+dfProp <- lm(painYn~sexNominal, data = dfSession4a)
+
+library(sjPlot)
+tab_model(dfProp)
