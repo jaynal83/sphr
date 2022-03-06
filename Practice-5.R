@@ -181,3 +181,162 @@ dfProp <- lm(painYn~sexNominal, data = dfSession4a)
 
 library(sjPlot)
 tab_model(dfProp)
+
+# Sampling Distribution
+# Let's consider the data we have is the entire population
+# We want to know the sampling distribution of average age, minimum age, maximum age
+# median age, standard deviation of age
+#
+# We also want to know the samplign distribution of proportion of pain
+
+library(purrr)
+library(ggplot2)
+
+# Population mean age = 27.67
+# Population sd of age =9.73  
+
+# Sampling distribution of mean age
+rep(x = 10, times = 100) %>% 
+  map_dfr(
+    function(x){
+      dfSession4a %>%
+        sample_n(
+          size = x
+        ) %>%
+        summarise(
+          mean_age = mean(age)
+        ) 
+    }
+  ) %>%
+  ggplot()+
+  geom_histogram(
+    aes(
+      x=mean_age
+    )
+  )
+
+# Sampling distribution of median age
+rep(x = 10, times = 1000) %>% 
+  map_dfr(
+    function(x){
+      dfSession4a %>%
+        sample_n(
+          size = x
+        ) %>%
+        summarise(
+          median_age = median(age)
+        ) 
+    }
+  ) %>%
+  ggplot()+
+  geom_histogram(
+    aes(
+      x=median_age
+    )
+  )
+
+# Sampling distribution of maximum age
+rep(x = 10, times = 10000) %>% 
+  map_dfr(
+    function(x){
+      dfSession4a %>%
+        sample_n(
+          size = x
+        ) %>%
+        summarise(
+          max_age = max(age)
+        ) 
+    }
+  ) %>%
+  ggplot()+
+  geom_histogram(
+    aes(
+      x=max_age
+    )
+  )
+
+# Sampling distribution of Minimum age
+rep(x = 10, times = 10000) %>% 
+  map_dfr(
+    function(x){
+      dfSession4a %>%
+        sample_n(
+          size = x
+        ) %>%
+        summarise(
+          xxxxxxxxxxx
+        ) 
+    }
+  ) %>%
+  ggplot()+
+  geom_histogram(
+    aes(
+      x=xxxxxxxxxxx
+    )
+  )
+
+# Sampling distribution of Standard deviation of age
+rep(x = 10, times = 10000) %>% 
+  map_dfr(
+    function(x){
+      dfSession4a %>%
+        sample_n(
+          size = x
+        ) %>%
+        summarise(
+          xxxxxxxxxxx
+        ) 
+    }
+  ) %>%
+  ggplot()+
+  geom_histogram(
+    aes(
+      x=xxxxxxxxxxx
+    )
+  )
+
+# Sampling distribution of proportion (painYn)
+rep(x = 10, times = 10000) %>% 
+  map_dfr(
+    function(x){
+      dfSession4a %>%
+        sample_n(
+          size = x
+        ) %>%
+        summarise(
+          xxxxxxxxxxx
+        ) 
+    }
+  ) %>%
+  ggplot()+
+  geom_histogram(
+    aes(
+      x=xxxxxxxxxxx
+    )
+  )
+
+# Sampling distribution of Mean age by sex
+rep(x = 10, times = 1000) %>% 
+  map_dfr(
+    function(x){
+      dfSession4a %>%
+        group_by(
+          sexNominal
+        ) %>%
+        sample_n(
+          size = x
+        ) %>%
+        summarise(
+          mean_age = mean(age)
+        ) 
+    }
+  ) %>%
+  ggplot()+
+  geom_histogram(
+    aes(
+      x=mean_age
+    )
+  ) +
+  facet_wrap(
+    ~sexNominal, ncol=2
+  )
