@@ -187,7 +187,7 @@ tab_model(dfProp)
 # We want to know the sampling distribution of average age, minimum age, maximum age
 # median age, standard deviation of age
 #
-# We also want to know the samplign distribution of proportion of pain
+# We also want to know the sampling distribution of proportion of pain
 
 library(purrr)
 library(ggplot2)
@@ -196,7 +196,7 @@ library(ggplot2)
 # Population sd of age =9.73  
 
 # Sampling distribution of mean age
-rep(x = 10, times = 100) %>% 
+rep(x = 50, times = 500) %>% 
   map_dfr(
     function(x){
       dfSession4a %>%
@@ -256,7 +256,7 @@ rep(x = 10, times = 10000) %>%
   )
 
 # Sampling distribution of Minimum age
-rep(x = 10, times = 10000) %>% 
+rep(x = 10, times = 1000) %>% 
   map_dfr(
     function(x){
       dfSession4a %>%
@@ -264,14 +264,14 @@ rep(x = 10, times = 10000) %>%
           size = x
         ) %>%
         summarise(
-          xxxxxxxxxxx
+          min_age = min(age)
         ) 
     }
   ) %>%
   ggplot()+
   geom_histogram(
     aes(
-      x=xxxxxxxxxxx
+      x=min_age
     )
   )
 
@@ -284,19 +284,19 @@ rep(x = 10, times = 10000) %>%
           size = x
         ) %>%
         summarise(
-          xxxxxxxxxxx
+          sd_age = sd(age)
         ) 
     }
   ) %>%
   ggplot()+
   geom_histogram(
     aes(
-      x=xxxxxxxxxxx
+      x=sd_age
     )
   )
 
 # Sampling distribution of proportion (painYn)
-rep(x = 10, times = 10000) %>% 
+rep(x = 100, times = 10000) %>% 
   map_dfr(
     function(x){
       dfSession4a %>%
@@ -304,14 +304,14 @@ rep(x = 10, times = 10000) %>%
           size = x
         ) %>%
         summarise(
-          xxxxxxxxxxx
+          porpPain = mean(painYn)
         ) 
     }
   ) %>%
   ggplot()+
   geom_histogram(
     aes(
-      x=xxxxxxxxxxx
+      x=porpPain
     )
   )
 
@@ -340,3 +340,67 @@ rep(x = 10, times = 1000) %>%
   facet_wrap(
     ~sexNominal, ncol=2
   )
+
+
+# Regression Modeling 
+
+dfProp <- dfSession4a %>%
+  group_by(
+    sexNominal
+  ) %>%
+  summarise(
+    propPain = mean(painYn)
+  )
+
+
+# 1. What is the difference between proportion of pain (risk difference) between male and female
+
+mdl_RD <- glm(
+  painYn ~ sexNominal, 
+  family = "gaussian",
+  data = dfSession4a
+)
+
+
+# to see model output summary
+summary(mdl_RD)
+
+# to get confidence interval
+confint(mdl_RD)
+
+# To adjust by an external variable e.g. age
+mdl_RD_adj <- glm(
+  painYn~sexNominal+age,
+  family = "gaussian",
+  data = dfSession4a
+)
+
+summary(mdl_RD_adj)
+confint(mdl_RD_adj)
+
+# To get formatted tabular output of a regression model
+library(sjPlot)
+
+tab_model(mdl_RD)
+
+# 2. What is the ratio between proportion of pain (risk ratio) between male and female
+
+mdl_RR <- glm(
+  painYn~sexNominal,
+  family = "poisson",
+  data = dfSession4a
+)
+
+summary(mdl_RR)
+exp(coef(mdl_RR))
+exp(confint(mdl_RR))
+
+# Odds ratio
+mdl_OR <- glm(
+  painYn~sexNominal,
+  family = "binomial",
+  data = dfSession4a
+)
+
+summary(mdl_OR)
+exp(coef(mdl_OR))
